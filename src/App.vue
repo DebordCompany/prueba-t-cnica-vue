@@ -3,10 +3,19 @@ import { onMounted, ref } from "vue";
 import getBooks from "./lib/api/getBooks";
 import type { Book } from "./lib/types";
 const books = ref<Book[]>();
+const booksFilter = ref<Book[]>();
 const input = ref({
-  pages: 1200,
+  pages: 2000,
   genere: "",
 });
+
+function setPages() {
+  const filter = books.value?.filter((book) => {
+    return book.pages <= input.value.pages;
+  });
+
+  booksFilter.value = filter;
+}
 
 async function getLocalBooks() {
   const res = await getBooks();
@@ -14,6 +23,7 @@ async function getLocalBooks() {
     return item.book;
   });
   books.value = uniqueBook;
+  booksFilter.value = uniqueBook;
 }
 onMounted(() => {
   getLocalBooks();
@@ -21,11 +31,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="max-w-screen-2xl m-auto p-6 bg-neutral-900 text-neutral-50">
-    <h1 class="text-6xl">Tus libros disponibles: {{ books?.length }}</h1>
+  <main
+    class="max-w-screen-2xl m-auto p-6 bg-neutral-900 text-neutral-50 min-h-dvh"
+  >
+    <h1 class="text-6xl">Tus libros disponibles: {{ booksFilter?.length }}</h1>
     <div class="flex gap-4">
       <div>
-        <input min="1" max="1000" step="1" type="range" />
+        <input
+          min="1"
+          max="2000"
+          step="1"
+          type="range"
+          @change="setPages"
+          v-model="input.pages"
+        />
         <div class="flex justify-between">
           <p>0</p>
           <p>{{ input.pages }}</p>
@@ -44,7 +63,7 @@ onMounted(() => {
     <section class="grid grid-cols-[3fr,1fr] pt-10 gap-4">
       <article class="grid grid-cols-2 gap-4">
         <div
-          v-for="item in books"
+          v-for="item in booksFilter"
           class="grid grid-cols-[1fr,2fr] gap-4 p-4 shadow-[0px_0px_30px_#00000050] rounded-md"
         >
           <img
