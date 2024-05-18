@@ -1,7 +1,7 @@
 export type Book = {
   title: string;
   pages: number;
-  genere: string;
+  genre: string;
   cover: string;
   synopsis: string;
   year: number;
