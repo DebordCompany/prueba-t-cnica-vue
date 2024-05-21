@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "tailwind": "npx tailwindcss -i ./src/input.css -o ./src/style.css --watch"
+    "tailwind": "npx tailwindcss -i ./src/input.css -o ./src/style.css --watch",
+    "test": "vitest"
   },
   "dependencies": {
     "pinia": "^2.1.7",
@@ -15,6 +16,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^24.0.0",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.2.2",
     "vite": "^5.2.0",

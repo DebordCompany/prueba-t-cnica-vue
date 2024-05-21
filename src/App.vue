@@ -3,6 +3,8 @@ import { onMounted, ref } from "vue";
 import getBooks from "./lib/api/getBooks";
 import type { Book } from "./lib/types";
 import { setLocalStorage, getLocalStorage } from "./lib/utils";
+
+import Componente from "./components/Componente.vue";
 const booksReaded = ref<Book[]>([]);
 const booksUnReaded = ref<Book[]>([]);
 const input = ref({
@@ -80,6 +82,7 @@ onMounted(() => {
     <h1 class="text-6xl">
       Tus libros disponibles: {{ booksUnReaded?.length }}
     </h1>
+    <Componente />
     <div class="flex gap-8 items-center">
       <div>
         <input
@@ -102,12 +105,12 @@ onMounted(() => {
         <option value="Aventuras">Aventuras</option>
       </select>
 
-      <div
+      <button
         @click="resetFilter"
         class="px-4 py-2 bg-neutral-800 text-neutral-50"
       >
         <p>Limpiar filtros</p>
-      </div>
+      </button>
     </div>
     <section class="grid grid-cols-[3fr,1fr] pt-10 gap-4">
       <article class="grid grid-cols-2 gap-4">
