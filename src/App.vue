@@ -7,10 +7,27 @@ const booksReaded = ref<Book[]>([]);
 const booksUnReaded = ref<Book[]>([]);
 const input = ref({
   pages: 2000,
-  genre: "Fantasía",
+  genre: "Todos",
 });
 
-function getBooksFilter() {}
+function getBooksFilter() {
+  const books = getLocalStorage("books");
+  const booksRead = getLocalStorage("readBooks");
+  const booksNotReaded = books.filter((element: Book) => {
+    return !booksRead.some((e: Book) => e.ISBN === element.ISBN);
+  });
+  const filter = booksNotReaded.filter((element: Book) => {
+    if (input.value.genre == "Todos") {
+      return (
+        element.genre == element.genre && element.pages <= input.value.pages
+      );
+    }
+    return (
+      element.pages <= input.value.pages && element.genre == input.value.genre
+    );
+  });
+  booksUnReaded.value = filter;
+}
 
 function getBooksReaded(item: Book) {
   booksReaded.value.push(item);
@@ -28,25 +45,29 @@ function returnBooksReaded(item: Book) {
   booksReaded.value = filter;
   setLocalStorage("readBooks", booksReaded.value);
 }
-function resetFilter() {}
+function resetFilter() {
+  const books = getLocalStorage("books");
+  const booksReaded = getLocalStorage("readBooks");
+  const bookUnRead = books.filter((element: Book) => {
+    return !booksReaded.some((e: Book) => e.ISBN === element.ISBN);
+  });
+  booksUnReaded.value = bookUnRead;
+}
 async function getLocalBooks() {
   const res = await getBooks();
-
-  const uniqueBook = res.library.map((item: { book: Book }) => {
+  const books = res.library.map((item: { book: Book }) => {
     return item.book;
   });
+  setLocalStorage("books", books);
   const state = getLocalStorage("readBooks");
-
-  booksUnReaded.value = uniqueBook;
   if (state) {
-    const stateParse = JSON.parse(state);
-    const booksNotReaded = uniqueBook.filter((element: Book) => {
-      return !stateParse.some((a: Book) => a.ISBN === element.ISBN);
+    const booksNotReaded = books.filter((element: Book) => {
+      return !state.some((a: Book) => a.ISBN === element.ISBN);
     });
-    booksReaded.value = stateParse;
+    booksReaded.value = state;
     booksUnReaded.value = booksNotReaded;
   } else {
-    booksUnReaded.value = uniqueBook;
+    booksUnReaded.value = books;
   }
 }
 onMounted(() => {
@@ -66,8 +87,8 @@ onMounted(() => {
           max="2000"
           step="1"
           type="range"
-          @change="getBooksFilter"
           v-model="input.pages"
+          @change="getBooksFilter"
         />
         <div class="flex justify-between">
           <p>0</p>
@@ -75,15 +96,17 @@ onMounted(() => {
         </div>
       </div>
       <select name="genre" v-model="input.genre" @change="getBooksFilter">
+        <option value="Todos" selected>Todos</option>
         <option value="Fantasía" selected>Fantasia</option>
         <option value="Terror">Terror</option>
         <option value="Aventuras">Aventuras</option>
       </select>
+
       <div
         @click="resetFilter"
         class="px-4 py-2 bg-neutral-800 text-neutral-50"
       >
-        <p>Reset Filter</p>
+        <p>Limpiar filtros</p>
       </div>
     </div>
     <section class="grid grid-cols-[3fr,1fr] pt-10 gap-4">

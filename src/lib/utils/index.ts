@@ -5,5 +5,10 @@ export function setLocalStorage(name: string, data: Book[]) {
 }
 
 export function getLocalStorage(name: string) {
-  return window.localStorage.getItem(name);
+  const data = window.localStorage.getItem(name);
+  if (data) {
+    return JSON.parse(data);
+  } else {
+    return name;
+  }
 }
